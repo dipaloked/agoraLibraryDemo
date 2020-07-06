@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">VideoCallApp</string>
+
+    <string name="agora_app_id">eb48c176a508499f95d0f3b11eb98220</string>
+    <string name="agora_access_token">006eb48c176a508499f95d0f3b11eb98220IAC/9vandNlEfVgVZb+/LRK97gBZ21sson+DrFYap86OMIk7lGcAAAAAEADXzqF+b5MDXwEAAQBokwNf</string>
+
+    <string name="add_mob_app_id">ca-app-pub-8470141741857039~4929393550</string>
+    <string name="banner_id">ca-app-pub-3940256099942544/6300978111</string>
+
+    <string name="message">You are going to be connected to a video communication</string>
+</resources>
