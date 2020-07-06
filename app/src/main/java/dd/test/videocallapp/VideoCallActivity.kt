@@ -1,6 +1,7 @@
 package dd.test.videocallapp
 
 import android.os.Bundle
+import android.os.Handler
 import android.text.TextUtils
 import android.util.Log
 import android.view.SurfaceView
@@ -24,12 +25,40 @@ class VideoCallActivity : AppCompatActivity() {
 
     private var mLocalView: SurfaceView?=null
     private var mRemoteView: SurfaceView?=null
+    private var localUserId=0
+
+    private var maxAllowedDelayTime=15//in seconds
+
+    private var mHandler= Handler()
+    private val mRunnable = object : Runnable{
+        override fun run() {
+
+            if(maxAllowedDelayTime==0)
+            {
+                mHandler.removeCallbacks(this)
+                runOnUiThread {
+                    showLongToast("Please try again after some time")
+                    endCall()
+                    finish()
+                }
+            }
+            else
+            {
+                maxAllowedDelayTime--
+                mHandler.postDelayed(this,1000)
+            }
+
+        }
+
+    }
 
     private val mRtcEventHandler: IRtcEngineEventHandler = object : IRtcEngineEventHandler() {
 
         override fun onJoinChannelSuccess(channel: String, uid: Int, elapsedTime: Int) {
 //            runOnUiThread {
 //                showLongToast("Join channel success, uid: $uid")}
+            localUserId=uid
+            mHandler.postDelayed(mRunnable,1000)
         }
 
         /**
@@ -57,21 +86,15 @@ class VideoCallActivity : AppCompatActivity() {
             //272964
             runOnUiThread {
                 if(elapsedTime/1000<=15 || mRemoteUserAlreadyConnected)
-                    setupRemoteVideo(uid)
-                else
                 {
-                    endCall()
-                    showLongToast("Please try again after some time")
-                    finish()
+                    mHandler.removeCallbacks(mRunnable)
+                    setupRemoteVideo(uid)
                 }
-
             }
         }
 
         override fun onUserOffline(uid: Int, reason: Int) {
             runOnUiThread {
-//                mLogView.logI("User offline, uid: " + (uid and 0xFFFFFFFFL))
-                showLongToast("Offline reason code -> $reason")
                 onRemoteUserLeft()
             }
         }
@@ -121,14 +144,13 @@ class VideoCallActivity : AppCompatActivity() {
         }
         // Destroys remote view
         mRemoteView = null
-
-        showLongToast("Another user has left the channel")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
         initEngineAndJoinChannel()
     }
 

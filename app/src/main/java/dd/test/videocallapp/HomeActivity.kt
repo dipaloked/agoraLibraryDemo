@@ -32,7 +32,9 @@ class HomeActivity : AppCompatActivity() {
 
         //init AdMob
         MobileAds.initialize(
-            this,"")
+            this){
+
+        }
 
         val adRequest =
             AdRequest.Builder().build()
